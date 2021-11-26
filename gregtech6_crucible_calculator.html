@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="UTF-8" />
+		<title>GregTech 6 Crucible Calculator</title>
+	</head>
+	<body>
+		<p>Fuel Burn Time: <input type="text" id="fuelTime" onchange="calculate();"/></p>
+		<p>Weight: <input type="text" id="weight" onchange="calculate();"/></p>
+		<p>Crucible Type: 
+			<select id="crucible" onchange="calculate();">
+				<option value="stone">Stone</option>
+				<option value="basalt">Basalt</option>
+				<option value="blackgranite">Black Granite</option>
+				<option value="redgranite">Red Granite</option>
+				<option value="netherbrick">Nether Brick</option>
+				<option value="ceramic">Ceramic</option>
+				<option value="umberstone">Umberstone</option>
+				<option value="quartz">Quartz</option>
+				<option value="carbon">Carbon</option>
+				<option value="bronze">Bronze</option>
+				<option value="invar">Invar</option>
+				<option value="steel">Steel</option>
+				<option value="stainlesssteel">Stainless Steel</option>
+				<option value="meteoriciron">Meteoric Steel</option>
+				<option value="meteoricsteel">Meteoric Steel</option>
+				<option value="netherite">Netherite</option>
+				<option value="octine">Octine</option>
+				<option value="titanium">Titanium</option>
+				<option value="chromium">Chromium</option>
+				<option value="molybdenum">Molybdenum</option>
+				<option value="niobium">Niobium</option>
+				<option value="tantalum">Tantalum</option>
+				<option value="osmium">Osmium</option>
+				<option value="iridium">Iridium</option>
+				<option value="niobiumtitanium">Niobium Titanium</option>
+				<option value="vanadium">Vanadium</option>
+				<option value="tungsten">Tungsten</option>
+				<option value="tantalumhafniumcarbide">Tantalum Hafnium Carbide</option>
+				<option value="adamantium">Adamantium</option>
+			</select>
+		</p>
+		<p>Burning Box Type: 
+			<select id="burningBox" onchange="onBurningBoxChanged();calculate();">
+				<option value="brick">Brick</option>
+				<option value="lead">Lead</option>
+				<option value="bismuth">Bismuth</option>
+				<option value="bronze">Bronze</option>
+				<option value="invar">Invar</option>
+				<option value="steel">Steel</option>
+				<option value="chromium">Chromium</option>
+				<option value="titanium">Titanium</option>
+				<option value="netherite">Netherite</option>
+				<option value="tungsten">Tungsten</option>
+				<option value="tungstensteel">Tungstensteel</option>
+				<option value="tantalumhafniumcarbide">Tantalum Hafnium Carbide</option>
+			</select>
+		</p>
+		<p>
+			<input id="isDense" disabled="true" type="checkbox" value="dense" onchange="calculate();"/>Dense 
+			<input id="isFluidized" disabled="true" type="checkbox" value="fluidizedBed" onchange="calculate();"/>Fluidized Bed
+		</p>
+		<p id="resultTime">Burn time: </p>
+		<p id="resultHeat">HU generated: </p>
+		<p id="resultTemperature">Temperature change: </p>
+		<p id="resultSafe"></p>
+	</body>
+	<script type="text/javascript">
+		function onBurningBoxChanged() {
+			var select = document.getElementById("burningBox");
+			if (select.selectedIndex == 0) {
+				document.getElementById("isDense").disabled = true;
+				document.getElementById("isDense").checked = false;
+				document.getElementById("isFluidized").disabled = true;
+				document.getElementById("isFluidized").checked = false;
+			} else {
+				document.getElementById("isDense").disabled = false;
+				document.getElementById("isFluidized").disabled = false;
+			}
+		}
+		function calculate() {
+			var crucibleData = [
+				[7000.000, 1375],
+				[6600.849, 2091],
+				[5905.714, 1875],
+				[5905.714, 1875],
+				[7000.000, 2250],
+				[636.486, 2500],
+				[7000.000, 1233],
+				[604.711, 2482],
+				[1763.222, 4750],
+				[6643.583, 1696],
+				[6393.333, 2395],
+				[6124.222, 2557],
+				[6113.851, 2428],
+				[6124.222, 2513],
+				[6124.222, 2807],
+				[63099.555, 2807],
+				[777.777, 3667],
+				[3531.111, 2426],
+				[5561.111, 2725],
+				[7948.888, 2896],
+				[6665.555, 3437],
+				[12953.111, 4112],
+				[17585.555, 4132],
+				[17546.666, 3398],
+				[5098.333, 2931],
+				[4752.222, 2728],
+				[14972.222, 4618],
+				[7098.077, 5328],
+				[10388.192, 6531]
+			];
+			var burningBoxData = [
+				[16, 0.25],
+				[16, 0.5],
+				[20, 0.45],
+				[24, 0.75],
+				[16, 1.0],
+				[32, 0.7],
+				[112, 0.85],
+				[96, 0.85],
+				[96, 0.9],
+				[128, 1.0],
+				[128, 0.9],
+				[256, 1.0]
+			];
+			var selectBurningBox = document.getElementById("burningBox");
+			var selectCrucible = document.getElementById("crucible");
+			var huPerTick = burningBoxData[selectBurningBox.selectedIndex][0] * (document.getElementById("isDense").checked ? 4 : 1) * (document.getElementById("isFluidized").checked ? 4 : 1);
+			var totalHu = Number(document.getElementById("fuelTime").value) * 25 * (document.getElementById("isFluidized").checked ? 3 : 1) * burningBoxData[selectBurningBox.selectedIndex][1];
+			var totalTime = totalHu / huPerTick;
+			var temperature = totalHu * 100 / (crucibleData[selectCrucible.selectedIndex][0] + Number(document.getElementById("weight").value));
+			document.getElementById("resultTime").innerHTML = "Burn Time: " + totalTime;
+			document.getElementById("resultHeat").innerHTML = "HU generated: " + totalHu;
+			document.getElementById("resultTemperature").innerHTML = "Temperature change: " + temperature;
+			document.getElementById("resultSafe").innerHTML = (temperature > (crucibleData[selectCrucible.selectedIndex][1] - 282))        ? "Melt"      :
+			                                                 ((temperature > (crucibleData[selectCrucible.selectedIndex][1] - 282) * 0.85) ? "Dangerous" :
+			                                                                                                                                 "Safe");
+		}
+	</script>
+</html>
